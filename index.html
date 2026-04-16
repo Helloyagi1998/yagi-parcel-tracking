@@ -91,6 +91,18 @@ td,th{padding:10px;}
 <p>Status: <span id="status"></span></p>
 </div>
 
+<div id="progressBar" style="margin-top:20px;">
+  <div style="display:flex; justify-content:space-between; font-size:12px;">
+    <span id="step1">Pending</span>
+    <span id="step2">Transit</span>
+    <span id="step3">Delivered</span>
+  </div>
+
+  <div style="height:8px; background:#ddd; border-radius:10px; margin-top:5px;">
+    <div id="progressFill" style="height:8px; width:0%; background:gold; border-radius:10px;"></div>
+  </div>
+</div>
+
 <br>
 <button onclick="showAdminLogin()">Admin</button>
 </div>
@@ -237,6 +249,7 @@ function trackParcel(){
       sender.innerText=p.sender;
       receiver.innerText=p.receiver;
       status.innerText=p.status;
+      updateProgress(p.status);
       resultBox.style.display="block";
       errorMsg.style.display="none";
     }else{
@@ -244,6 +257,20 @@ function trackParcel(){
       errorMsg.style.display="block";
     }
   });
+}
+
+function updateProgress(status){
+  let fill = document.getElementById("progressFill");
+
+  if(status === "Pending Pickup"){
+    fill.style.width = "33%";
+  }
+  else if(status === "In Transit"){
+    fill.style.width = "66%";
+  }
+  else if(status === "Delivered"){
+    fill.style.width = "100%";
+  }
 }
 
 showCustomerView();
