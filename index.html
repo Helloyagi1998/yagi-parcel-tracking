@@ -1,290 +1,253 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Yagi Parcel Tracking</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-      transition: 0.3s;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yagi Parcel Tracking</title>
 
-    body {
-      background: linear-gradient(135deg, #0b1f3a, #1d4ed8);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      color: white;
-    }
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
 
-    body.dark {
-      background: linear-gradient(135deg, #050b14, #0b1220);
-    }
+body{
+  background: linear-gradient(135deg,#0b1f3a,#1d4ed8);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+  color:white;
+}
 
-    .tracking-container {
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(12px);
-      width: 100%;
-      max-width: 600px;
-      padding: 35px 25px;
-      border-radius: 22px;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-    }
+/* DARK MODE BACK */
+body.dark{
+  background: linear-gradient(135deg,#050b14,#0b1220);
+}
 
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
+.tracking-container{
+  background:rgba(255,255,255,0.12);
+  backdrop-filter:blur(12px);
+  width:100%;
+  max-width:620px;
+  padding:40px 30px;
+  border-radius:22px;
+}
 
-    h1 {
-      font-size: 30px;
-      color: gold;
-    }
+h1{text-align:center;color:gold;}
+p{text-align:center;margin-bottom:20px;}
 
-    .dark-btn {
-      background: gold;
-      color: black;
-      border: none;
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.input-box{display:flex;flex-direction:column;gap:14px;}
 
-    p {
-      margin-bottom: 20px;
-      font-size: 17px;
-      color: #f0f0f0;
-      line-height: 1.6;
-    }
+input,select{
+  padding:14px;
+  border:none;
+  border-radius:10px;
+}
 
-    .input-box {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      margin-bottom: 25px;
-    }
+button{
+  background:gold;
+  border:none;
+  padding:14px;
+  border-radius:10px;
+  font-weight:bold;
+  cursor:pointer;
+}
 
-    .input-box input {
-      padding: 15px;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      outline: none;
-    }
+.result-box{display:none;margin-top:20px;}
+.error{display:none;color:red;margin-top:10px;}
 
-    .input-box button {
-      background: gold;
-      color: black;
-      border: none;
-      padding: 14px;
-      border-radius: 12px;
-      font-size: 17px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.admin-section{display:none;}
 
-    .input-box button:hover,
-    .dark-btn:hover {
-      transform: scale(1.03);
-    }
+table{
+  width:100%;
+  margin-top:20px;
+}
 
-    .result-box {
-      display: none;
-      background: rgba(255, 255, 255, 0.12);
-      padding: 22px;
-      border-radius: 18px;
-      margin-top: 15px;
-      text-align: left;
-    }
-
-    .result-box h2 {
-      text-align: center;
-      color: gold;
-      margin-bottom: 18px;
-      font-size: 24px;
-    }
-
-    .result-box p {
-      margin: 10px 0;
-      font-size: 17px;
-      color: white;
-    }
-
-    .status {
-      font-weight: bold;
-      color: #22c55e;
-      font-size: 18px;
-    }
-
-    .error {
-      display: none;
-      margin-top: 15px;
-      background: rgba(239, 68, 68, 0.15);
-      padding: 14px;
-      border-radius: 12px;
-      color: #ffb3b3;
-      font-weight: bold;
-    }
-
-    .progress {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 25px;
-      gap: 10px;
-    }
-
-    .step {
-      flex: 1;
-      padding: 12px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.12);
-      text-align: center;
-      font-size: 14px;
-      font-weight: bold;
-      opacity: 0.5;
-    }
-
-    .step.active {
-      background: gold;
-      color: black;
-      opacity: 1;
-    }
-  </style>
+td,th{padding:10px;}
+</style>
 </head>
+
 <body>
 
-  <div class="tracking-container">
-    <div class="top-bar">
-      <h1>📦 Yagi Parcel Tracking</h1>
-      <button class="dark-btn" onclick="toggleDarkMode()">🌙</button>
-    </div>
+<div class="tracking-container">
 
-    <p>Track your package easily by entering your tracking ID below.</p>
+<!-- DARK MODE BUTTON -->
+<button onclick="toggleDarkMode()" style="float:right;">🌙</button>
 
-    <div class="input-box">
-      <input type="text" id="trackingInput" placeholder="Enter Tracking ID (e.g. YAG12345)">
-      <button onclick="trackParcel()">Track Parcel</button>
-    </div>
+<!-- CUSTOMER -->
+<div id="customerView">
+<h1>📦 Yagi Parcel Tracking</h1>
 
-    <div class="error" id="errorMsg">Tracking ID not found. Please try again.</div>
+<div class="input-box">
+<input id="trackingInput" placeholder="Tracking ID">
+<button onclick="trackParcel()">Track</button>
+</div>
 
-    <div class="result-box" id="resultBox">
-      <h2>Shipment Details</h2>
-      <p><strong>Tracking ID:</strong> <span id="trackId"></span></p>
-      <p><strong>Sender:</strong> <span id="sender"></span></p>
-      <p><strong>Receiver:</strong> <span id="receiver"></span></p>
-      <p><strong>Origin:</strong> <span id="origin"></span></p>
-      <p><strong>Destination:</strong> <span id="destination"></span></p>
-      <p><strong>Current Location:</strong> <span id="location"></span></p>
-      <p><strong>Estimated Delivery:</strong> <span id="deliveryDate"></span></p>
-      <p><strong>Status:</strong> <span class="status" id="status"></span></p>
+<div id="errorMsg" class="error">Not found</div>
 
-      <div class="progress">
-        <div class="step" id="step1">Pending</div>
-        <div class="step" id="step2">In Transit</div>
-        <div class="step" id="step3">Delivered</div>
-      </div>
-    </div>
-  </div>
+<div id="resultBox" class="result-box">
+<p>ID: <span id="trackId"></span></p>
+<p>Sender: <span id="sender"></span></p>
+<p>Receiver: <span id="receiver"></span></p>
+<p>Status: <span id="status"></span></p>
+</div>
 
-  <script>
-    function toggleDarkMode() {
-      document.body.classList.toggle("dark");
+<br>
+<button onclick="showAdminLogin()">Admin</button>
+</div>
+
+<!-- LOGIN -->
+<div id="adminLoginView" class="admin-section">
+<h1>Admin Login</h1>
+
+<input id="adminUser" value="admin">
+<input id="adminPass" value="admin123">
+
+<button onclick="adminLogin()">Login</button>
+<button onclick="showCustomerView()">Back</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="adminDashboard" class="admin-section">
+<h1>Dashboard</h1>
+
+<input id="newTrackingId" placeholder="Tracking ID">
+<input id="newSender" placeholder="Sender">
+<input id="newReceiver" placeholder="Receiver">
+<input id="newOrigin" placeholder="Origin">
+<input id="newDestination" placeholder="Destination">
+
+<select id="newStatus">
+<option>Pending Pickup</option>
+<option>In Transit</option>
+<option>Delivered</option>
+</select>
+
+<button onclick="createNewParcel()">Create</button>
+
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Status</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
+
+<button onclick="logout()">Logout</button>
+</div>
+
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBVlxuIxDFLwVLSgPQO7KGgxYiW0IY6BDs",
+  authDomain: "yagiparcel.firebaseapp.com",
+  databaseURL: "https://yagiparcel-default-rtdb.firebaseio.com/",
+  projectId: "yagiparcel"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+/* DARK MODE */
+function toggleDarkMode(){
+  document.body.classList.toggle("dark");
+}
+
+/* NAV */
+function showAdminLogin(){
+  customerView.style.display="none";
+  adminLoginView.style.display="block";
+}
+function showCustomerView(){
+  customerView.style.display="block";
+  adminLoginView.style.display="none";
+  adminDashboard.style.display="none";
+}
+
+/* LOGIN */
+function adminLogin(){
+  if(adminUser.value==="admin" && adminPass.value==="admin123"){
+    adminLoginView.style.display="none";
+    adminDashboard.style.display="block";
+    renderTable();
+  }else alert("Wrong login");
+}
+
+function logout(){
+  showCustomerView();
+}
+
+/* CREATE */
+function createNewParcel(){
+  let id=newTrackingId.value.trim().toUpperCase() || "YAG"+Math.floor(Math.random()*99999);
+
+  db.ref("parcels/"+id).set({
+    sender:newSender.value,
+    receiver:newReceiver.value,
+    origin:newOrigin.value,
+    destination:newDestination.value,
+    status:newStatus.value
+  });
+
+  alert("Created: "+id);
+}
+
+/* TABLE */
+function renderTable(){
+  db.ref("parcels").on("value",snap=>{
+    tableBody.innerHTML="";
+    snap.forEach(child=>{
+      let p=child.val();
+      tableBody.innerHTML+=`
+      <tr>
+        <td>${child.key}</td>
+        <td>${p.status}</td>
+        <td>
+        <select onchange="updateStatus('${child.key}',this.value)">
+          <option>Pending Pickup</option>
+          <option>In Transit</option>
+          <option>Delivered</option>
+        </select>
+        </td>
+      </tr>`;
+    });
+  });
+}
+
+/* UPDATE */
+function updateStatus(id,val){
+  db.ref("parcels/"+id).update({status:val});
+}
+
+/* TRACK */
+function trackParcel(){
+  let id=trackingInput.value.trim().toUpperCase();
+
+  db.ref("parcels/"+id).on("value",snap=>{
+    if(snap.exists()){
+      let p=snap.val();
+      trackId.innerText=id;
+      sender.innerText=p.sender;
+      receiver.innerText=p.receiver;
+      status.innerText=p.status;
+      resultBox.style.display="block";
+      errorMsg.style.display="none";
+    }else{
+      resultBox.style.display="none";
+      errorMsg.style.display="block";
     }
+  });
+}
 
-    function trackParcel() {
-      const trackingInput = document.getElementById("trackingInput").value.trim().toUpperCase();
-      const resultBox = document.getElementById("resultBox");
-      const errorMsg = document.getElementById("errorMsg");
-
-      const parcels = {
-        "YAG12345": {
-          sender: "Sunday Emmanuel",
-          receiver: "Michael Johnson",
-          origin: "Abuja, Nigeria",
-          destination: "Lagos, Nigeria",
-          location: "Lokoja, Nigeria",
-          deliveryDate: "April 5, 2026",
-          status: "In Transit"
-        },
-        "YAG67890": {
-          sender: "Sarah James",
-          receiver: "David Smith",
-          origin: "London, UK",
-          destination: "Toronto, Canada",
-          location: "Toronto, Canada",
-          deliveryDate: "Delivered on April 1, 2026",
-          status: "Delivered"
-        },
-        "YAG11111": {
-          sender: "Grace Wilson",
-          receiver: "Esther Paul",
-          origin: "Dubai, UAE",
-          destination: "Abuja, Nigeria",
-          location: "Dubai, UAE",
-          deliveryDate: "April 8, 2026",
-          status: "Pending Pickup"
-        }
-      };
-
-      if (parcels[trackingInput]) {
-        const parcel = parcels[trackingInput];
-
-        document.getElementById("trackId").textContent = trackingInput;
-        document.getElementById("sender").textContent = parcel.sender;
-        document.getElementById("receiver").textContent = parcel.receiver;
-        document.getElementById("origin").textContent = parcel.origin;
-        document.getElementById("destination").textContent = parcel.destination;
-        document.getElementById("location").textContent = parcel.location;
-        document.getElementById("deliveryDate").textContent = parcel.deliveryDate;
-        document.getElementById("status").textContent = parcel.status;
-
-        localStorage.setItem("lastTrackingID", trackingInput);
-
-        resultBox.style.display = "block";
-        errorMsg.style.display = "none";
-
-        updateProgress(parcel.status);
-      } else {
-        resultBox.style.display = "none";
-        errorMsg.style.display = "block";
-      }
-    }
-
-    function updateProgress(status) {
-      document.getElementById("step1").classList.remove("active");
-      document.getElementById("step2").classList.remove("active");
-      document.getElementById("step3").classList.remove("active");
-
-      if (status === "Pending Pickup") {
-        document.getElementById("step1").classList.add("active");
-      } else if (status === "In Transit") {
-        document.getElementById("step1").classList.add("active");
-        document.getElementById("step2").classList.add("active");
-      } else if (status === "Delivered") {
-        document.getElementById("step1").classList.add("active");
-        document.getElementById("step2").classList.add("active");
-        document.getElementById("step3").classList.add("active");
-      }
-    }
-
-    window.onload = function () {
-      const lastTrackingID = localStorage.getItem("lastTrackingID");
-      if (lastTrackingID) {
-        document.getElementById("trackingInput").value = lastTrackingID;
-      }
-    };
-  </script>
+showCustomerView();
+</script>
 
 </body>
 </html>
