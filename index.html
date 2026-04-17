@@ -18,12 +18,12 @@ body{
   color:white;
 }
 
-/* DARK MODE BACK */
+/* DARK MODE */
 body.dark{
   background: linear-gradient(135deg,#050b14,#0b1220);
 }
 
-.tracking-container{
+.container{
   background:rgba(255,255,255,0.12);
   backdrop-filter:blur(12px);
   width:100%;
@@ -32,22 +32,18 @@ body.dark{
   border-radius:22px;
 }
 
-h1{text-align:center;color:gold;}
-p{text-align:center;margin-bottom:20px;}
+h1{text-align:center;color:gold;margin-bottom:10px;}
 
-.input-box{display:flex;flex-direction:column;gap:14px;}
-
-input,select{
-  padding:14px;
+input,select,button{
+  padding:12px;
   border:none;
   border-radius:10px;
+  margin-top:10px;
+  width:100%;
 }
 
 button{
   background:gold;
-  border:none;
-  padding:14px;
-  border-radius:10px;
   font-weight:bold;
   cursor:pointer;
 }
@@ -62,25 +58,22 @@ table{
   margin-top:20px;
 }
 
-td,th{padding:10px;}
+td,th{padding:10px;text-align:left;}
 </style>
 </head>
 
 <body>
 
-<div class="tracking-container">
+<div class="container">
 
-<!-- DARK MODE BUTTON -->
-<button onclick="toggleDarkMode()" style="float:right;">🌙</button>
+<button onclick="toggleDarkMode()">🌙 Toggle</button>
 
 <!-- CUSTOMER -->
 <div id="customerView">
 <h1>📦 Yagi Parcel Tracking</h1>
 
-<div class="input-box">
-<input id="trackingInput" placeholder="Tracking ID">
+<input id="trackingInput" placeholder="Enter Tracking ID">
 <button onclick="trackParcel()">Track</button>
-</div>
 
 <div id="errorMsg" class="error">Not found</div>
 
@@ -91,38 +84,38 @@ td,th{padding:10px;}
 <p>Status: <span id="status"></span></p>
 </div>
 
-<div id="progressBar" style="margin-top:20px;">
-  <div style="display:flex; justify-content:space-between; font-size:12px;">
-    <span id="step1">Pending</span>
-    <span id="step2">Transit</span>
-    <span id="step3">Delivered</span>
-  </div>
-
-  <div style="height:8px; background:#ddd; border-radius:10px; margin-top:5px;">
-    <div id="progressFill" style="height:8px; width:0%; background:gold; border-radius:10px;"></div>
-  </div>
+<!-- PROGRESS -->
+<div style="margin-top:20px;">
+<div style="display:flex;justify-content:space-between;font-size:12px;">
+<span>Pending</span>
+<span>Transit</span>
+<span>Delivered</span>
 </div>
 
-<br>
+<div style="height:8px;background:#ddd;border-radius:10px;margin-top:5px;">
+<div id="progressFill" style="height:8px;width:0%;background:gold;border-radius:10px;"></div>
+</div>
+</div>
+
 <button onclick="showAdminLogin()">Admin</button>
 </div>
 
-<!-- LOGIN -->
+<!-- ADMIN LOGIN -->
 <div id="adminLoginView" class="admin-section">
 <h1>Admin Login</h1>
 
-<input id="adminUser" value="admin">
-<input id="adminPass" value="admin123">
+<input id="adminUser" placeholder="Username">
+<input id="adminPass" placeholder="Password">
 
 <button onclick="adminLogin()">Login</button>
 <button onclick="showCustomerView()">Back</button>
 </div>
 
-<!-- DASHBOARD -->
+<!-- ADMIN DASHBOARD -->
 <div id="adminDashboard" class="admin-section">
 <h1>Dashboard</h1>
 
-<input id="newTrackingId" placeholder="Tracking ID">
+<input id="newTrackingId" placeholder="Tracking ID (optional)">
 <input id="newSender" placeholder="Sender">
 <input id="newReceiver" placeholder="Receiver">
 <input id="newOrigin" placeholder="Origin">
@@ -134,7 +127,7 @@ td,th{padding:10px;}
 <option>Delivered</option>
 </select>
 
-<button onclick="createNewParcel()">Create</button>
+<button onclick="createNewParcel()">Create Parcel</button>
 
 <table>
 <thead>
@@ -177,6 +170,7 @@ function showAdminLogin(){
   customerView.style.display="none";
   adminLoginView.style.display="block";
 }
+
 function showCustomerView(){
   customerView.style.display="block";
   adminLoginView.style.display="none";
@@ -189,7 +183,9 @@ function adminLogin(){
     adminLoginView.style.display="none";
     adminDashboard.style.display="block";
     renderTable();
-  }else alert("Wrong login");
+  } else {
+    alert("Wrong login");
+  }
 }
 
 function logout(){
@@ -198,7 +194,8 @@ function logout(){
 
 /* CREATE */
 function createNewParcel(){
-  let id=newTrackingId.value.trim().toUpperCase() || "YAG"+Math.floor(Math.random()*99999);
+  let id = newTrackingId.value.trim().toUpperCase() || 
+           "YAG" + Math.floor(10000 + Math.random()*90000);
 
   db.ref("parcels/"+id).set({
     sender:newSender.value,
@@ -206,9 +203,10 @@ function createNewParcel(){
     origin:newOrigin.value,
     destination:newDestination.value,
     status:newStatus.value
+  }).then(()=>{
+    alert("Created: " + id);
+    renderTable(); // 🔥 FIX: refresh instantly
   });
-
-  alert("Created: "+id);
 }
 
 /* TABLE */
@@ -217,16 +215,17 @@ function renderTable(){
     tableBody.innerHTML="";
     snap.forEach(child=>{
       let p=child.val();
+
       tableBody.innerHTML+=`
       <tr>
         <td>${child.key}</td>
         <td>${p.status}</td>
         <td>
-        <select onchange="updateStatus('${child.key}',this.value)">
-          <option>Pending Pickup</option>
-          <option>In Transit</option>
-          <option>Delivered</option>
-        </select>
+          <select onchange="updateStatus('${child.key}',this.value)">
+            <option ${p.status==="Pending Pickup"?"selected":""}>Pending Pickup</option>
+            <option ${p.status==="In Transit"?"selected":""}>In Transit</option>
+            <option ${p.status==="Delivered"?"selected":""}>Delivered</option>
+          </select>
         </td>
       </tr>`;
     });
@@ -245,31 +244,35 @@ function trackParcel(){
   db.ref("parcels/"+id).on("value",snap=>{
     if(snap.exists()){
       let p=snap.val();
+
       trackId.innerText=id;
       sender.innerText=p.sender;
       receiver.innerText=p.receiver;
       status.innerText=p.status;
+
       updateProgress(p.status);
+
       resultBox.style.display="block";
       errorMsg.style.display="none";
-    }else{
+    } else {
       resultBox.style.display="none";
       errorMsg.style.display="block";
     }
   });
 }
 
+/* PROGRESS */
 function updateProgress(status){
-  let fill = document.getElementById("progressFill");
+  let fill=document.getElementById("progressFill");
 
-  if(status === "Pending Pickup"){
-    fill.style.width = "33%";
+  if(status==="Pending Pickup"){
+    fill.style.width="33%";
   }
-  else if(status === "In Transit"){
-    fill.style.width = "66%";
+  else if(status==="In Transit"){
+    fill.style.width="66%";
   }
-  else if(status === "Delivered"){
-    fill.style.width = "100%";
+  else if(status==="Delivered"){
+    fill.style.width="100%";
   }
 }
 
