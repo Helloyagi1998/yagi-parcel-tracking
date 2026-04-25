@@ -102,7 +102,7 @@ td,th{padding:10px;text-align:left;}
   <p>I build custom delivery tracking websites.</p>
   <p>📧 <strong>yagitechhub@gmail.com</strong></p>
 </div>
-  
+
 <button onclick="showAdminLogin()">Admin</button>
 </div>
 
@@ -184,20 +184,16 @@ function showCustomerView(){
 }
 
 /* LOGIN */
-function login(){
-  let pass = document.getElementById("adminPass").value;
-
-  firebase.database().ref("admin/password").once("value", function(snapshot){
-    let realPass = snapshot.val();
-
-    if(pass === realPass){
-      alert("Login success");
-    } else {
-      alert("Wrong password");
-    }
-  });
+function adminLogin(){
+  if(adminUser.value==="admin" && adminPass.value==="admin123"){
+    adminLoginView.style.display="none";
+    adminDashboard.style.display="block";
+    renderTable();
+  } else {
+    alert("Wrong login");
+  }
 }
-  
+
 function logout(){
   showCustomerView();
 }
