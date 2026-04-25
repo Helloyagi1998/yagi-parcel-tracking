@@ -185,13 +185,17 @@ function showCustomerView(){
 
 /* LOGIN */
 function login(){
-  let pass = document.getElementById("password").value;
+  let pass = document.getElementById("adminPass").value;
 
-  if(pass === "admin123"){
-    alert("Login success");
-  } else {
-    alert("Wrong password");
-  }
+  firebase.database().ref("admin/password").once("value", function(snapshot){
+    let realPass = snapshot.val();
+
+    if(pass === realPass){
+      alert("Login success");
+    } else {
+      alert("Wrong password");
+    }
+  });
 }
   
 function logout(){
