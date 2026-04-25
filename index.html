@@ -184,16 +184,16 @@ function showCustomerView(){
 }
 
 /* LOGIN */
-function adminLogin(){
-  if(adminUser.value==="admin" && adminPass.value==="admin123"){
-    adminLoginView.style.display="none";
-    adminDashboard.style.display="block";
-    renderTable();
+function login(){
+  let pass = document.getElementById("password").value;
+
+  if(pass === "admin123"){
+    alert("Login success");
   } else {
-    alert("Wrong login");
+    alert("Wrong password");
   }
 }
-
+  
 function logout(){
   showCustomerView();
 }
